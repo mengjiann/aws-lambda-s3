@@ -9,7 +9,7 @@ Resources:
       Handler: com.mj.aws.lambda.s3.AwsLambdaS3FunctionHandler
       Description: For AWS S3
       Runtime: java8
-      CodeUri: ./target/aws-lambda-s3-0.0.1-SNAPSHOT-aws.jar
+      CodeUri: ./target/aws-lambda-s3-0.0.2-SNAPSHOT-aws.jar
       MemorySize: 320
       Timeout: 120
       Environment:
