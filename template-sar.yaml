@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket name which the lambda will access
+Transform: AWS::Serverless-2016-10-31
+Description: Spring Cloud Functions.
+Resources:
+  S3BucketRef:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref BucketName
+  AwsLambdaS3Local:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: aws-lambda-s3
+      Handler: com.mj.aws.lambda.s3.AwsLambdaS3FunctionHandler
+      Description: For AWS S3
+      Runtime: java8
+      CodeUri: s3://my-sar-artifact/aws-lambda-s3/aws-lambda-s3-0.0.2-SNAPSHOT-aws.jar
+      MemorySize: 320
+      Timeout: 240
+      Policies:
+        - AWSLambdaExecute
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:GetObjectVersion
+              Resource:
+              - Fn::Sub:
+                  - arn:${AWS::Partition}:s3:::${bucketName}
+                  - bucketName:
+                      Ref: BucketName
+              - Fn::Sub:
+                  - arn:${AWS::Partition}:s3:::${bucketName}/*
+                  - bucketName:
+                      Ref: BucketName
+      Events:
+        ObjectUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref S3BucketRef
+            Events: s3:ObjectCreated:*
+      Environment:
+        Variables:
+          SPRING_PROFILES_ACTIVE: aws
